@@ -1,9 +1,15 @@
-import * as React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  Platform,
+  KeyboardAvoidingView,
+  SafeAreaView,
+  Keyboard,
+  View,
+} from "react-native";
+import React, { Component } from "react";
 import { GiftedChat } from "react-native-gifted-chat";
 import Fire from "../Fire";
 
-export default class ChatScreen extends React.Component() {
+export default class ChatScreen extends React.Component {
   state = {
     messages: [],
   };
@@ -23,27 +29,30 @@ export default class ChatScreen extends React.Component() {
     );
   }
 
+  componentWillUnmount() {
+    Fire.off();
+  }
+
   render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.paragraph}>
-          Change code in the editor and watch it change on your phone! Save to
-          get a shareable url.
-        </Text>
-      </View>
+    const chat = (
+      <GiftedChat
+        messages={this.state.messages}
+        onSend={Fire.send}
+        user={this.user}
+      />
     );
+    if (Platform.OS === "android") {
+      return (
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior="padding"
+          keyboardVerticalOffset={30}
+          enabled
+        >
+          {chat}
+        </KeyboardAvoidingView>
+      );
+    }
+    return <SafeAreaView style={{ flex: 1 }}>{chat}</SafeAreaView>;
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  paragraph: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
-});
